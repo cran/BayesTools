@@ -110,7 +110,7 @@ plot_prior_list <- function(prior_list, plot_type = "base",
   xlim      <- range(as.vector(sapply(plot_data, attr, which = "x_range")))
 
   main      <- ""
-  xlab      <- if(!is.null(par_name)){parse(text = bquote(.(par_name)))} else ""
+  xlab      <- if(!is.null(par_name)) par_name else ""
 
   if(any(sapply(plot_data, inherits, what = "density.prior.simple")) & any(sapply(plot_data, inherits, what = "density.prior.point"))){
     type  <- "both"
@@ -149,9 +149,14 @@ plot_prior_list <- function(prior_list, plot_type = "base",
     scale_y2 <- .get_scale_y2(plot_data, dots)
     for(i in seq_along(plot_data)){
       if(inherits(plot_data[[i]], what = "density.prior.simple")){
-        do.call(.lines.prior.simple, c(list(plot_data[[i]]), dots))
+        args           <- dots
+        args$plot_data <- plot_data[[i]]
+        do.call(.lines.prior.simple, args)
       }else if(inherits(plot_data[[i]], what = "density.prior.point")){
-        do.call(.lines.prior.point,  c(list(plot_data[[i]]), scale_y2 = scale_y2, dots))
+        args           <- dots
+        args$scale_y2  <- scale_y2
+        args$plot_data <- plot_data[[i]]
+        do.call(.lines.prior.point, args)
       }
     }
     plot <- list(scale_y2 = scale_y2)
@@ -162,9 +167,14 @@ plot_prior_list <- function(prior_list, plot_type = "base",
     scale_y2 <- .get_scale_y2(plot_data, dots)
     for(i in seq_along(plot_data)){
       if(inherits(plot_data[[i]], what = "density.prior.simple")){
-        plot <- plot + do.call(.geom_prior.simple, c(list(plot_data[[i]]), dots))
+        args           <- dots
+        args$plot_data <- plot_data[[i]]
+        plot           <- plot + do.call(.geom_prior.simple, args)
       }else if(inherits(plot_data[[i]], what = "density.prior.point")){
-        plot <- plot + do.call(.geom_prior.point,  c(list(plot_data[[i]]), scale_y2 = scale_y2, dots))
+        args           <- dots
+        args$scale_y2  <- scale_y2
+        args$plot_data <- plot_data[[i]]
+        plot           <- plot + do.call(.geom_prior.point, args)
       }
     }
 
@@ -401,7 +411,7 @@ plot_prior_list <- function(prior_list, plot_type = "base",
     )
 
     class(out_den) <- c("density", "density.prior", "density.prior.simple")
-    attr(out_den, "x_range") <- x_range
+    attr(out_den, "x_range") <- range(x_den)
     attr(out_den, "y_range") <- c(0, max(y_den))
 
     out[["density"]] <- out_den
@@ -420,7 +430,7 @@ plot_prior_list <- function(prior_list, plot_type = "base",
       )
 
       class(temp_points) <- c("density", "density.prior", "density.prior.point")
-      attr(temp_points, "x_range") <- x_range
+      attr(temp_points, "x_range") <- range(x_points)
       attr(temp_points, "y_range") <- c(0, max(y_points[i]))
 
       out[[paste0("points",i)]] <- temp_points
@@ -763,7 +773,13 @@ plot_posterior <- function(samples, parameter, plot_type = "base", prior = FALSE
       attr(plot_data_prior, "y_range") <- ylim
       dots_prior <- .transfer_dots(dots_prior, ...)
 
-      plot <- do.call(.plot.prior.weightfunction, c(x = list(prior_list), plot_data = list(plot_data_prior), rescale_x = rescale_x, plot_type = plot_type, par_name = par_name, dots_prior))
+      args           <- dots_prior
+      args$x         <- prior_list
+      args$plot_data <- plot_data_prior
+      args$rescale_x <- rescale_x
+      args$plot_type <- plot_type
+      args$par_name  <- par_name
+      plot           <- do.call(.plot.prior.weightfunction, args)
 
       if(plot_type == "ggplot"){
         plot <- plot + .geom_prior.weightfunction(plot_data, rescale_x = rescale_x, ...)
@@ -826,7 +842,12 @@ plot_posterior <- function(samples, parameter, plot_type = "base", prior = FALSE
       attr(plot_data_prior, "y_range") <- ylim
       dots_prior <- .transfer_dots(dots_prior, ...)
 
-      plot <- do.call(.plot.prior.PETPEESE, c(x = list(prior_list), plot_data = list(plot_data_prior), plot_type = plot_type, par_name = par_name, dots_prior))
+      args           <- dots_prior
+      args$x         <- prior_list
+      args$plot_data <- plot_data_prior
+      args$plot_type <- plot_type
+      args$par_name  <- par_name
+      plot           <- do.call(.plot.prior.PETPEESE, args)
 
       if(plot_type == "ggplot"){
         plot <- plot + .geom_prior.PETPEESE(plot_data, ...)
@@ -878,7 +899,12 @@ plot_posterior <- function(samples, parameter, plot_type = "base", prior = FALSE
 
       scale_y2   <- .get_scale_y2(plot_data_prior, ...)
       dots_prior <- .transfer_dots(dots_prior, ...)
-      plot       <- do.call(.plot_prior_list.both, c(plot_data = list(plot_data_prior), plot_type = plot_type, par_name = par_name, dots_prior))
+
+      args           <- dots_prior
+      args$plot_data <- plot_data_prior
+      args$plot_type <- plot_type
+      args$par_name  <- par_name
+      plot           <- do.call(.plot_prior_list.both, args)
 
       if(plot_type == "ggplot"){
         for(i in seq_along(plot_data)){
@@ -1155,13 +1181,20 @@ plot_posterior <- function(samples, parameter, plot_type = "base", prior = FALSE
 #' @param parameter parameter name to be plotted. Does not support
 #' PET-PEESE and weightfunction.
 #' @param inference object created by [ensemble_inference] function
-#' @param condtional whether conditional models should be displayed
+#' @param conditional whether conditional models should be displayed
 #' @param order list specifying ordering of the models. The first
 #' element describes whether the ordering should be \code{"increasing"}
 #' or \code{"decreasing"} and the second element describes whether
 #' the ordering should be based \code{"model"} order, \code{"estimate"}
 #' size, posterior \code{"probability"}, or the inclusion \code{"BF"}.
-#' @param ... additional arguments
+#' @param ... additional arguments. E.g.:
+#' \describe{
+#'   \item{\code{"show_updating"}}{whether Bayes factors and change from
+#'   prior to posterior odds should be shown on the secondary y-axis}
+#'   \item{\code{"show_estimates"}}{whether posterior estimates and 95% CI
+#'   should be shown on the secondary y-axis}
+#'   \item{\code{"y_axis2"}}{whether the secondary y-axis should be shown}
+#' }
 #' @inheritParams ensemble_inference
 #' @inheritParams plot.prior
 #' @inheritParams plot_posterior
@@ -1171,7 +1204,7 @@ plot_posterior <- function(samples, parameter, plot_type = "base", prior = FALSE
 #'
 #' @seealso [prior()] [lines_prior_list()]  [geom_prior_list()]
 #' @export
-plot_models <- function(model_list, samples, inference, parameter, plot_type = "base", prior = FALSE, condtional = FALSE,
+plot_models <- function(model_list, samples, inference, parameter, plot_type = "base", prior = FALSE, conditional = FALSE,
                         order = NULL,
                         transformation = NULL, transformation_arguments = NULL, transformation_settings = FALSE,
                         par_name = NULL, ...){
@@ -1227,7 +1260,7 @@ plot_models <- function(model_list, samples, inference, parameter, plot_type = "
   posterior_data[is.na(posterior_data)] <- prior_data[is.na(posterior_data)]
 
   # remove null models if requested (assuming that the overall estimate is already supplied accordingly)
-  if(condtional){
+  if(conditional){
     prior_data     <- prior_data[!attr(total_inference, "is_null"),]
     posterior_data <- posterior_data[!attr(total_inference, "is_null"),]
   }
@@ -1236,10 +1269,10 @@ plot_models <- function(model_list, samples, inference, parameter, plot_type = "
   if(!is.null(order)){
     prior_data <- switch(
       order[[2]],
-      "model"       = prior_data[order(prior_data$model,      decreasing = order[[1]] == "decreasing"),],
-      "estimate"    = prior_data[order(prior_data$y,          decreasing = order[[1]] == "decreasing"),],
-      "probability" = prior_data[order(prior_data$post_prob,  decreasing = order[[1]] == "decreasing"),],
-      "BF"          = prior_data[order(prior_data$BF,         decreasing = order[[1]] == "decreasing"),]
+      "model"       = prior_data[order(posterior_data$model,      decreasing = order[[1]] == "decreasing"),],
+      "estimate"    = prior_data[order(posterior_data$y,          decreasing = order[[1]] == "decreasing"),],
+      "probability" = prior_data[order(posterior_data$post_prob,  decreasing = order[[1]] == "decreasing"),],
+      "BF"          = prior_data[order(posterior_data$BF,         decreasing = order[[1]] == "decreasing"),]
     )
     posterior_data <- switch(
       order[[2]],
@@ -1285,17 +1318,16 @@ plot_models <- function(model_list, samples, inference, parameter, plot_type = "
 
   # set the plotting values
   dots      <- list(...)
+
+  show_updating  <- is.null(dots[["show_updating"]])  || dots[["show_updating"]]
+  show_estimates <- is.null(dots[["show_estimates"]]) || dots[["show_estimates"]]
+
   y_at      <- c(1,               posterior_data$x)
   y_labels  <- c(overal_y_label,  paste0("Model ", posterior_data$model))
-  if(!is.null(dots[["fit_details"]]) && !dots[["fit_details"]]){
-    y_at2     <- c(1,               posterior_data$x)
-    y_labels2 <- c(overal_y_label2, posterior_data$y_labels2)
-  }else{
-    y_at2     <- c(1,               posterior_data$x,         prior_data$x)
-    y_labels2 <- c(overal_y_label2, posterior_data$y_labels2, prior_data$y_labels2)
-  }
-
+  y_at2     <- c(1,               posterior_data$x[show_estimates],         prior_data$x[show_updating])
+  y_labels2 <- c(overal_y_label2, posterior_data$y_labels2[show_estimates], prior_data$y_labels2[show_updating])
   ylim      <- c(0, max(posterior_data$x) + 1)
+
 
   if(!is.null(dots[["xlim"]])){
     xlim     <- dots[["xlim"]]
@@ -1341,7 +1373,7 @@ plot_models <- function(model_list, samples, inference, parameter, plot_type = "
 
     graphics::plot(NA, bty = "n", las = 1, xlab = xlab, ylab = "", main = "", yaxt = "n", ylim = ylim, xlim = xlim)
     graphics::axis(2, at = y_at,  labels = y_labels,  las = 1, col = NA)
-    if(is.null(dots[["y_axis2"]]) || (is.null(dots[["y_axis2"]]) && dots[["y_axis2"]])){
+    if(is.null(dots[["y_axis2"]]) || (!is.null(dots[["y_axis2"]]) && dots[["y_axis2"]])){
       graphics::axis(4, at = y_at2, labels = y_labels2, las = 1, col = NA, hadj = 0)
     }
     graphics::abline(v = vertical_0, lty = 3)
@@ -1421,7 +1453,7 @@ plot_models <- function(model_list, samples, inference, parameter, plot_type = "
       linetype = "dotted")
 
     # add all the other stuff
-    if(is.null(dots[["y_axis2"]]) || (is.null(dots[["y_axis2"]]) && dots[["y_axis2"]])){
+    if(is.null(dots[["y_axis2"]]) || (!is.null(dots[["y_axis2"]]) && dots[["y_axis2"]])){
       plot <- plot + ggplot2::scale_y_continuous(
         name = "", breaks = y_at, labels = y_labels, limits = ylim,
         sec.axis = ggplot2::sec_axis( ~ ., breaks = y_at2, labels = y_labels2))

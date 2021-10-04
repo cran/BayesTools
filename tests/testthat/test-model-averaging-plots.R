@@ -385,7 +385,7 @@ test_that("posterior plot functions (simple) work", {
     oldpar <- graphics::par(no.readonly = TRUE)
     on.exit(graphics::par(mar = oldpar[["mar"]]))
     par(mar = c(4, 4, 1, 4))
-    plot_posterior(mixed_posteriors, "m", lwd = 2, col = "red", par_name = bquote(mu))
+    plot_posterior(mixed_posteriors, "m", lwd = 2, col = "red", par_name = expression(mu))
     lines_prior_list(attr(mixed_posteriors$m, "prior_list"), col = "blue")
   })
   expect_doppelganger("model-averaging-plot-posterior-simple-2", {
@@ -673,16 +673,22 @@ test_that("models plot functions work", {
     plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "tau", prior = TRUE)
   })
   expect_doppelganger("model-averaging-plot-models-5", function(){
-    plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "mu", condtional = TRUE)
+    plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "mu", conditional = TRUE)
   })
   expect_doppelganger("model-averaging-plot-models-6", function(){
-    plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "tau", prior = TRUE, condtional = TRUE)
+    plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "tau", prior = TRUE, conditional = TRUE)
   })
   expect_doppelganger("model-averaging-plot-models-7", {
     plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "mu", plot_type = "ggplot")
   })
   expect_doppelganger("model-averaging-plot-models-8", {
     plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "tau", prior = TRUE, plot_type = "ggplot")
+  })
+  expect_doppelganger("model-averaging-plot-models-9", {
+    plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "mu", plot_type = "ggplot", y_axis2 = FALSE)
+  })
+  expect_doppelganger("model-averaging-plot-models-10", {
+    plot_models(model_list = models, samples = mixed_posteriors, inference = inference, parameter = "mu", plot_type = "ggplot", show_estimates = FALSE)
   })
 
 })

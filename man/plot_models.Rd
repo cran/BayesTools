@@ -11,7 +11,7 @@ plot_models(
   parameter,
   plot_type = "base",
   prior = FALSE,
-  condtional = FALSE,
+  conditional = FALSE,
   order = NULL,
   transformation = NULL,
   transformation_arguments = NULL,
@@ -38,7 +38,7 @@ or ggplot2 \code{"ggplot"} for plotting.}
 
 \item{prior}{whether prior distribution should be added to the figure}
 
-\item{condtional}{whether conditional models should be displayed}
+\item{conditional}{whether conditional models should be displayed}
 
 \item{order}{list specifying ordering of the models. The first
 element describes whether the ordering should be \code{"increasing"}
@@ -68,7 +68,14 @@ the transformed support}
 specified. Only relevant if the prior corresponds to a mu
 parameter that needs to be transformed.}
 
-\item{...}{additional arguments}
+\item{...}{additional arguments. E.g.:
+\describe{
+\item{\code{"show_updating"}}{whether Bayes factors and change from
+prior to posterior odds should be shown on the secondary y-axis}
+\item{\code{"show_estimates"}}{whether posterior estimates and 95\% CI
+should be shown on the secondary y-axis}
+\item{\code{"y_axis2"}}{whether the secondary y-axis should be shown}
+}}
 }
 \value{
 \code{plot_models} returns either \code{NULL} or

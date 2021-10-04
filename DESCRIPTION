@@ -1,6 +1,6 @@
 Package: BayesTools
 Title: Tools for Bayesian Analyses
-Version: 0.1.1
+Version: 0.1.2
 Description: Provides tools for conducting Bayesian analyses. The package contains 
     functions for creating a wide range of prior distribution objects, mixing posterior 
     samples from 'JAGS' and 'Stan' models, plotting posterior distributions, and etc...
@@ -21,7 +21,7 @@ Imports: graphics, extraDistr, runjags, coda, bridgesampling, parallel,
         ggplot2
 Suggests: scales, testthat, vdiffr, covr, rjags, rstan
 NeedsCompilation: no
-Packaged: 2021-07-08 12:48:14 UTC; fbart
+Packaged: 2021-10-04 07:17:08 UTC; fbart
 Author: František Bartoš [aut, cre] (<https://orcid.org/0000-0002-0018-5573>)
 Repository: CRAN
-Date/Publication: 2021-07-13 12:00:19 UTC
+Date/Publication: 2021-10-04 09:20:02 UTC
