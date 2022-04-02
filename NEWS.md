@@ -1,3 +1,32 @@
+## version 0.2.3
+### Fixes
+- fixing error from trying to rename formula parameters in BayesTools tables when multiple parameters were nested within a component
+
+## version 0.2.2
+### Fixes
+- fixing layering of prior and posterior plots in `plot_posterior` (posterior is now plotted over the prior)
+
+## version 0.2.1
+### Fixes
+- fixing JAGS code for multivariate-t prior distribution
+
+## version 0.2.0
+### Changes
+- ensemble inference, summary, and plot functions now extract the prior list from attribute of the fit objects (previously, the prior_list needed to be passed for each model within the model_list as the priors argument
+
+### Features
+- adding formula interface for fitting and computing marginal likelihood of JAGS models
+- adding factor prior distributions (with treatment and orthonormal contrasts)
+
+## version 0.1.4
+### Fixes
+- fixing DOIs in the references file
+- adds marglik argument `inclusion_BF` to deal with over/underflow (Issue #9)
+- better passing of BF names through the `ensemble_inference_table()` (Issue #11)
+
+### Features
+- adding logBF and BF01 options to `ensemble_summary_table` (Issue #7)
+
 ## version 0.1.3
 ### Features
 - `prior_informed` function for creating informed prior distributions based on the past psychological and medical research

@@ -1,6 +1,6 @@
 Package: BayesTools
 Title: Tools for Bayesian Analyses
-Version: 0.1.3
+Version: 0.2.3
 Description: Provides tools for conducting Bayesian analyses. The package contains 
     functions for creating a wide range of prior distribution objects, mixing posterior 
     samples from 'JAGS' and 'Stan' models, plotting posterior distributions, and etc...
@@ -15,14 +15,14 @@ URL: https://fbartos.github.io/BayesTools/
 BugReports: https://github.com/FBartos/BayesTools/issues
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Depends: stats
-Imports: graphics, extraDistr, runjags, coda, bridgesampling, parallel,
-        ggplot2, Rdpack
+Imports: graphics, extraDistr, mvtnorm, runjags, coda, bridgesampling,
+        parallel, ggplot2, Rdpack
 Suggests: scales, testthat, vdiffr, covr, rjags, rstan
 RdMacros: Rdpack
 NeedsCompilation: no
-Packaged: 2021-10-30 15:43:12 UTC; fbart
+Packaged: 2022-04-02 06:29:37 UTC; fbart
 Author: František Bartoš [aut, cre] (<https://orcid.org/0000-0002-0018-5573>)
 Repository: CRAN
-Date/Publication: 2021-10-31 06:00:09 UTC
+Date/Publication: 2022-04-02 22:40:10 UTC
