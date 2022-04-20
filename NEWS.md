@@ -1,3 +1,38 @@
+## version 0.2.8
+### Fixes
+- dealing with point prior distributions in `JAGS_marglik_parameters_formula` function
+- posterior samples dropping name in `runjags_estimates_table` function
+- `ensemble_summary_table` and `ensemble_diagnostics_table` function can create table without model components
+
+## version 0.2.7
+### Features
+- `JAGS_evaluate_formula` for evaluating formulas based on data and posterior samples (for creating predictions etc)  
+- `JAGS_parameter_names` for transforming formula names into the JAGS syntax
+
+## version 0.2.6
+### Features
+- `plot_models` implementation for factor predictors
+- `format_parameter_names` for cleaning parameter names from JAGS
+- `mean`, `sd`, and `var` functions now return the corresponding values for differences from the mean for the orthonormal prior distributions
+
+### Fixes
+- proper splitting of transformed posterior samples based on orthonormal contrasts in `runjags_summary_table` function (previous version crashed under other than default `fit_JAGS` settings)
+- always showing name of the comparison group for treatment contrasts  in `runjags_summary_table` function
+- better handling of transformed parameter names in `plot_models` function
+
+## version 0.2.5
+### Features
+- `add_column` function for extending `BayesTools_table` objects without breaking the attributes etc...
+- ability to suppress the formula parameter prefix in `BayesTools_table` functions with with `formula_prefix` argument
+
+### Fixes
+- allowing to pass point prior distributions for factor type predictors
+
+## version 0.2.4
+### Features
+- adding possibility to multiply a (formula) prior parameter by another term (via `multiply_by` attribute passed with the prior)
+- t-test example vignette
+
 ## version 0.2.3
 ### Fixes
 - fixing error from trying to rename formula parameters in BayesTools tables when multiple parameters were nested within a component
