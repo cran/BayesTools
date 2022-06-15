@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="František Bartoš" />
+
+<meta name="date" content="2022-06-15" />
+
+<title>Bayes factors via spike and slab prior vs. bridge sampling</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Bayes factors via spike and slab prior
+vs. bridge sampling</h1>
+<h4 class="author">František Bartoš</h4>
+<h4 class="date">2022-06-15</h4>
+
+
+
+<p>One of the main features of BayesTools is assistance in generating
+JAGS <span class="citation">(Plummer, 2003)</span> code based on
+formulas and prior distribution objects and subsequent estimation of
+marginal likelihoods with the bridgesampling R package <span class="citation">(Gronau et al., 2020)</span>. Marginal likelihoods,
+<span class="math inline">\(p(\text{data} \mid \mathcal{M})\)</span>,
+are the key ingredient for computing Bayes factors,</p>
+<p><span class="math inline">\(\text{BF}_{10} = \frac{p(\text{data} \mid
+\mathcal{M}_{1})}{p(\text{data} \mid \mathcal{M}_{0})}\)</span>,</p>
+<p>which quantify relative predictive performance of two competing
+models <span class="citation">(Kass &amp; Raftery, 1995; Rouder &amp;
+Morey, 2019; Wrinch &amp; Jeffreys, 1921)</span>. Convenient model
+specification then allows users and package developers to easily compute
+Bayes factors and test a wide range of informed hypotheses. See RoBMA
+<span class="citation">(Bartoš &amp; Maier, 2020)</span> and <span class="citation">(Bartoš, 2022)</span> R packages for implementation
+examples.</p>
+<p>However, when considering a simple regression, the model space of all
+possible models increases exponentially with additional predictors.
+I.e., the possibility of including vs. excluding <span class="math inline">\(k\)</span> predictors leads to <span class="math inline">\(2^k\)</span> possible submodels that need to be
+computed. Even relatively computationally simple models (e.g. ~ 1 min of
+computation) with 10 possible predictors would result in more than 17
+hours of computation. Therefore, we might require more computationally
+efficient methods when performing variable selection with more than a
+few covariates. In this vignette, I showcase how to use BayesTools
+package to specify spike and slab priors that aim to explore most of the
+model space and obtain posterior inclusion probabilities for each
+predictor within a single MCMC run <span class="citation">(Kuo &amp;
+Mallick, 1998; O’Hara &amp; Sillanpää, 2009)</span>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BayesTools)</span></code></pre></div>
+<div id="simulated-data" class="section level2">
+<h2>Simulated Data</h2>
+<p>To keep it simple, let’s consider a linear regression with one
+continuous predictor <span class="math inline">\(x\)</span>. We simulate
+<span class="math inline">\(N = 100\)</span> observations of a dependent
+variable <span class="math inline">\(y\)</span> under the presence of a
+small effect <span class="math inline">\(\beta\)</span> of a continuous
+predictor <span class="math inline">\(x\)</span>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="sc">-</span><span class="dv">68</span>) <span class="co"># set seed for reproducibility</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>N     <span class="ot">&lt;-</span> <span class="dv">100</span>      <span class="co"># number of observations</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>x     <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N) <span class="co"># continuous predictor</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.5</span>     <span class="co"># intercept</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>beta  <span class="ot">&lt;-</span> <span class="fl">0.15</span>     <span class="co"># small effect</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># compute the mean parameter for each predictor value</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta <span class="sc">*</span> x</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># generate the response for each observation </span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N, <span class="at">mean =</span> mu, <span class="at">sd =</span> <span class="dv">1</span>) </span></code></pre></div>
+<p>We quickly verify that our simulated data correspond to the desired
+settings (up to a random error) with the <code>lm</code> function.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; lm(formula = y ~ x)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.2960 -0.6832  0.0683  0.7448  2.3815 </span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Intercept)  -0.5487     0.1032  -5.315  6.7e-07 ***</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; x             0.1962     0.1010   1.943   0.0549 .  </span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 1.03 on 98 degrees of freedom</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.03708,    Adjusted R-squared:  0.02725 </span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; F-statistic: 3.774 on 1 and 98 DF,  p-value: 0.05494</span></span></code></pre></div>
+</div>
+<div id="model-specification" class="section level2">
+<h2>Model Specification</h2>
+<p>We consider two following models:</p>
+<ul>
+<li><span class="math inline">\(\mathcal{M}_0\)</span>: <span class="math inline">\(\beta = 0\)</span></li>
+<li>and <span class="math inline">\(\mathcal{M}_1\)</span>: <span class="math inline">\(\beta \sim g()\)</span>,</li>
+</ul>
+<p>where <span class="math inline">\(g()\)</span> characterizes our
+hypothesis about the degree of the effect. In our example, we specify a
+simple two-sided hypothesis represented by a normal distribution with
+mean 0 and standard deviation 0.5, e.g., <span class="math inline">\(\beta \sim \text{Normal}(0, 0.5^2)\)</span>.</p>
+</div>
+<div id="maginal-likelihoods" class="section level2">
+<h2>Maginal Likelihoods</h2>
+<p>First, we compute the Bayes factor model comparison via marginal
+likelihoods. To do that, we need to specify the likelihood for the
+response variable <span class="math inline">\(y\)</span>,</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model_likelihood <span class="ot">&lt;-</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;model{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">  for(i in 1:N){</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">    y[i] ~ dnorm(mu[i], pow(sigma, -2))</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span></span></code></pre></div>
+<p>where <code>mu</code> corresponds to the mean parameter (that we
+specify via a formula in the next step) and <code>sigma</code> to a
+standard deviation of the response variable (that we treat as a nuisance
+parameter here).</p>
+<p>We specify formulas for the <code>mu</code> parameter of each of the
+considered models,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>formula_M0 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="er">~</span> <span class="dv">1</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>formula_M1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="er">~</span> <span class="dv">1</span> <span class="sc">+</span> x)</span></code></pre></div>
+<p>where <code>1</code> corresponds to the intercept (it is not
+necessary for the second model as it is included by default).</p>
+<p>To finish the model specification, we set the prior distribution
+corresponding to our hypothesis test of the beta parameter, set a broad
+prior distributions for the nuisance intercept and sigma parameters, and
+create a list containing data for the model specified within
+<code>model_likelihood</code> (in the first step) and a data frame for
+the data contained within the formula for mu within
+<code>formula_M0</code> and <code>formula_M1</code> (specified in the
+second step).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prior on the test parameter</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>prior_beta  <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># priors on the nuisance parameters</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>prior_int   <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">5</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>prior_sigma <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">5</span>), <span class="at">truncation =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="cn">Inf</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># the data list</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>data_list <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> y,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> N</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>data_formula <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>We estimate the models with the <code>JAGS_fit</code> function. Since
+we are using the formula interface (which allows us to specify multiple
+formulas for different parameters), we need to pass the arguments as
+named lists,</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>M0 <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the `model_likelihood` part</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the `formula_M0` part </span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M0,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int)),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># seed for reproducibility</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">0</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>M1 <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta)),</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">1</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>We quickly verify that our parameter estimates (from the full model)
+are similar to the frequentist results obtained via <code>lm</code>
+function earlier.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(M1)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept -0.547 0.104 -0.753 -0.548 -0.341     0.00081          0.008</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x          0.188 0.101 -0.012  0.189  0.385     0.00080          0.008</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma           1.042 0.076  0.905  1.037  1.205     0.00078          0.010</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  ESS R-hat</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept 16408 1.000</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x         15964 1.000</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma           9502 1.000</span></span></code></pre></div>
+<p>To obtain the marginal likelihoods and compute Bayes factors, we only
+need to write the likelihood function corresponding to the JAGS model.
+Importantly, BayesTools handles all priors and formula related
+computation automatically, in other words, we do not need to worry about
+computing the mean parameter based on the intercept and predictors since
+we already obtain the computed mu in the <code>parameters[[&quot;mu&quot;]]</code>
+object (a vector with a value for each y),</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(parameters, data){</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">dnorm</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x    =</span> data[[<span class="st">&quot;y&quot;</span>]],</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> parameters[[<span class="st">&quot;mu&quot;</span>]],</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd   =</span> parameters[[<span class="st">&quot;sigma&quot;</span>]],</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">log  =</span> <span class="cn">TRUE</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>where the <code>parameters</code> arguments is a list containing the
+parameters and <code>data</code> argument is a list containing data. We
+use <code>sum(dnorm(..., log = TRUE))</code> to sum the logarithmic
+likelihood of all observations.</p>
+<p>Finally, we pass our objects to the <code>JAGS_bridgesampling</code>
+function to compute the marginal likelihoods.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>marglik_model_H0 <span class="ot">&lt;-</span> <span class="fu">JAGS_bridgesampling</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the model part</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit           =</span> M0,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">log_posterior =</span> log_posterior,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list    =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the formula` part </span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M0,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int)),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>marglik_model_H1 <span class="ot">&lt;-</span> <span class="fu">JAGS_bridgesampling</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit           =</span> M1,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">log_posterior =</span> log_posterior,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list    =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta)),</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>We specify a BayesTools model ensemble object that we interrogate
+with the <code>ensemble_inference_table</code> function for information
+about the test for the beta parameter.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>models_list <span class="ot">&lt;-</span> <span class="fu">models_inference</span>(<span class="fu">list</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">model =</span> M0, <span class="at">marglik =</span> marglik_model_H0, <span class="at">prior_weights =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">model =</span> M1, <span class="at">marglik =</span> marglik_model_H1, <span class="at">prior_weights =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ensemble_info <span class="ot">&lt;-</span> <span class="fu">ensemble_inference</span>(models_list, <span class="at">parameters =</span> <span class="st">&quot;x&quot;</span>, <span class="at">is_null_list =</span> <span class="fu">list</span>(<span class="st">&quot;x&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ensemble_inference_table</span>(ensemble_info, <span class="at">parameters =</span> <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Models Prior prob. Post. prob. Inclusion BF</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; x    1/2       0.500       0.541        1.181</span></span></code></pre></div>
+<p>We find absence of evidence for either of the hypotheses, <span class="math inline">\(\text{BF}_{10} = 1.181\)</span>, with posterior
+probability of <span class="math inline">\(P(\mathcal{M}_{1} \mid
+\text{data}) = 0.542\)</span> (asuming equal prior probability specified
+via <code>prior_weights</code> in the <code>models_inference</code>
+function previously).</p>
+</div>
+<div id="spike-and-slab-priors" class="section level2">
+<h2>Spike and Slab Priors</h2>
+<p>The <span class="citation">Kuo &amp; Mallick (1998)</span>’s spike an
+slab prior distribution is specified as a mixture of two prior
+distributions. A spike, a parameter value of zero corresponding to no
+effect, and a slab, a parameter value sampled from a continuous density
+corresponding to the alternative hypothesis. The parametrization uses
+two independent prior distributions: one for the parameter value, <span class="math inline">\(\beta \sim g()\)</span>, and one for the inclusion
+indicator, <span class="math inline">\(I_\beta \sim f()\)</span>, which
+assigns the prior model probability <span class="math inline">\(P(\mathcal{M}_{1})\)</span> of inclusion.</p>
+<p>The inclusion indicator can attain one of two values: either zero or
+one. Multiplying the parameter with the inclusion indicator, <span class="math inline">\(\beta I_\beta\)</span>, then results in setting
+the parameter to zero when the indicator is zero, or keeping its
+original value when the indicator is one. The proportion of times the
+indicator attains the value of one then corresponds to the posterior
+inclusion probability of the predictor, <span class="math inline">\(P(\mathcal{M}_{1} \mid \text{data})\)</span>.
+Since Bayes factor can be written as the change from prior to posterior
+odds,</p>
+<p><span class="math inline">\(\text{BF}_{10} = \frac{p(\mathcal{M}_{1}
+\mid \text{data})}{p(\mathcal{M}_{0} \mid \text{data})} /
+\frac{p(\mathcal{M}_{1})}{p(\mathcal{M}_{0})}\)</span>,</p>
+<p>we can also estimate the Bayes factor via the inclusion
+indicator.</p>
+<p>Now, we compare the two models using the spike and slab prior. We
+have already specified the likelihood, data lists, prior distributions
+for the nuisance parameters, and even the formulas (now we need only
+formula for the full model) in the previous sections. Therefore, we
+proceed directly by specifying the spike and slab prior distribution for
+the predictor. We use the <code>prior_spike_and_slab</code> which
+follows similar notation as the <code>prior</code> function. We need to
+specify the distribution, the parameters (and we could also set
+truncation if needed) corresponding to the alternative hypothesis.
+Furthermore, we need to specify the prior distribution for the inclusion
+via the <code>prior_inclusion</code> argument. Here, we use a <span class="math inline">\(\text{Spike}(0.5)\)</span> prior which sets the
+prior inclusion probability to 1/2.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>prior_beta_spike_and_slab <span class="ot">&lt;-</span> <span class="fu">prior_spike_and_slab</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_parameter =</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>)),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_inclusion =</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;spike&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">location =</span> <span class="fl">0.5</span>)) </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Then we can directly proceed to calling the <code>JAGS_fit</code>
+function with the same specification as we used for the <code>M1</code>
+model, however, changing the prior distribution object for the predictor
+<code>x</code> to the newly created
+<code>prior_beta_spike_and_slab</code> prior distribution.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>MS <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta_spike_and_slab)),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">1</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>We can again verify that our parameter estimates match the previous
+results. Now, we need to set the <code>conditional = TRUE</code>
+argument in the <code>JAGS_estimates_table</code> to obtain samples
+assuming that the spike and slab parameter values are included. (The
+function summarized the complete posterior distribution by default,
+i.e., parameter estimates model-averaged across the spike and the
+slab.)</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(MS, <span class="at">conditional =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     -0.540 0.106 -0.749 -0.540 -0.333     0.00085          0.008</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x              0.189 0.100 -0.009  0.190  0.385     0.00145          0.012</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)  0.500 0.000  0.500  0.500  0.500          NA             NA</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma               1.050 0.076  0.912  1.047  1.211     0.00081          0.011</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      ESS R-hat</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     15590 1.000</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x              6830 1.000</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)    NA    NA</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma               8894 1.000</span></span></code></pre></div>
+<p>The estimates are essentially identical to the estimates from the
+previous models. Finally, we can also obtain summary of the inclusion
+probabilities via the <code>JAGS_inference_table</code> function</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">JAGS_inference_table</span>(MS)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Parameter Prior prob. Post. prob. Inclusion BF</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     (mu) x       0.500       0.536        1.157</span></span></code></pre></div>
+<p>As before, we find absence of evidence for either of the hypotheses,
+<span class="math inline">\(\text{BF}_{10} = 1.157\)</span>, with
+posterior probability of <span class="math inline">\(P(\mathcal{M}_{1}
+\mid \text{data}) = 0.536\)</span>.</p>
+<div id="references" class="section level3 unnumbered">
+<h3 class="unnumbered">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="ref-RoBSA" class="csl-entry">
+Bartoš, F. (2022). <em><span>RoBSA</span>: <span>A</span>n
+<span>R</span> package for robust <span>B</span>ayesian
+survival-analyses</em>. <a href="https://CRAN.R-project.org/package=RoBSA">https://CRAN.R-project.org/package=RoBSA</a>
+</div>
+<div id="ref-RoBMA" class="csl-entry">
+Bartoš, F., &amp; Maier, M. (2020). <em><span>RoBMA</span>:
+<span>A</span>n <span>R</span> package for robust <span>B</span>ayesian
+meta-analyses</em>. <a href="https://CRAN.R-project.org/package=RoBMA">https://CRAN.R-project.org/package=RoBMA</a>
+</div>
+<div id="ref-bridgesampling" class="csl-entry">
+Gronau, Q. F., Singmann, H., &amp; Wagenmakers, E.-J. (2020). <span class="nocase">bridgesampling</span>: <span>A</span>n <span>R</span>
+package for estimating normalizing constants. <em>Journal of Statistical
+Software</em>, <em>92</em>(10), 1–29. <a href="https://doi.org/10.18637/jss.v092.i10">https://doi.org/10.18637/jss.v092.i10</a>
+</div>
+<div id="ref-kass1995bayes" class="csl-entry">
+Kass, R. E., &amp; Raftery, A. E. (1995). <span>B</span>ayes factors.
+<em>Journal of the American Statistical Association</em>,
+<em>90</em>(430), 773–795. <a href="https://doi.org/10.1080/01621459.1995.10476572">https://doi.org/10.1080/01621459.1995.10476572</a>
+</div>
+<div id="ref-kuo1998variable" class="csl-entry">
+Kuo, L., &amp; Mallick, B. (1998). Variable selection for regression
+models. <em>Sankhy<span>ā</span>: The Indian Journal of Statistics,
+Series B</em>, 65–81.
+</div>
+<div id="ref-ohara2009review" class="csl-entry">
+O’Hara, R. B., &amp; Sillanpää, M. J. (2009). A review of bayesian
+variable selection methods: What, how and which. <em>Bayesian
+Analysis</em>, <em>4</em>(1), 85–117. <a href="https://doi.org/10.1214/09-BA403">https://doi.org/10.1214/09-BA403</a>
+</div>
+<div id="ref-JAGS" class="csl-entry">
+Plummer, M. (2003). <span>JAGS</span>: A program for analysis of
+<span>B</span>ayesian graphical models using <span>G</span>ibbs
+sampling. <em>Proceedings of the 3rd International Workshop on
+Distributed Statistical Computing</em>, <em>124</em>, 1–10.
+</div>
+<div id="ref-rouder2019teaching" class="csl-entry">
+Rouder, J. N., &amp; Morey, R. D. (2019). Teaching <span>B</span>ayes’
+theorem: Strength of evidence as predictive accuracy. <em>The American
+Statistician</em>, <em>73</em>(2), 186–190. <a href="https://doi.org/10.1080/00031305.2017.1341334">https://doi.org/10.1080/00031305.2017.1341334</a>
+</div>
+<div id="ref-wrinch1921on" class="csl-entry">
+Wrinch, D., &amp; Jeffreys, H. (1921). On certain fundamental principles
+of scientific inquiry. <em>Philosophical Magazine</em>, <em>42</em>,
+369–390. <a href="https://doi.org/10.1080/14786442108633773">https://doi.org/10.1080/14786442108633773</a>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

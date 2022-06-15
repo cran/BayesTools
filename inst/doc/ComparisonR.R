@@ -126,9 +126,9 @@ models_list <- models_inference(list(
   list(model = ttest_model_H0, marglik = marglik_model_H0, prior_weights = 1/2),
   list(model = ttest_model_Hp, marglik = marglik_model_Hp, prior_weights = 1/2)
 ))
-enseble_info <- ensemble_inference(models_list, parameters = "delta", is_null_list = list("delta" = c(TRUE, FALSE)))
+ensemble_info <- ensemble_inference(models_list, parameters = "delta", is_null_list = list("delta" = c(TRUE, FALSE)))
 
-ensemble_inference_table(enseble_info, "delta", BF01 = TRUE)
+ensemble_inference_table(ensemble_info, "delta", BF01 = TRUE)
 
 ## -----------------------------------------------------------------------------
 BayesFactor_ttest <- BayesFactor::ttestBF(x = x, y = y, rscale = "wide", nullInterval = c(0, Inf))
