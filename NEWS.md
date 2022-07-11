@@ -1,3 +1,13 @@
+## version 0.2.12
+### Features
+- `stan_estimates_summary()` function
+- reducing dependency on runjags/rjags
+
+### Fixes
+- dealing with posterior samples from rstan
+- dealing with vector posterior samples
+- fixing MCMC error of SD calculation for transformed samples (previously reported 100 times lower)
+
 ## version 0.2.11
 ### Features
 - adding Bernoulli prior distribution
@@ -8,7 +18,7 @@
 - when a transformation is applied, JAGS summary tables now produce the mean of the transformed variable (previous versions incorrectly returned transformation of the mean) 
 
 ### Changes
-- runjags_XXX_table functions are now also exported as JAGS_XXX_table functions for consistency with the rest of the code
+- runjags_XXX_table functions are now also exported as JAGS_XXX_functions for consistency with the rest of the code
 
 ## version 0.2.10
 ### Features
