@@ -12,7 +12,7 @@
 
 <meta name="author" content="František Bartoš" />
 
-<meta name="date" content="2022-07-09" />
+<meta name="date" content="2022-09-14" />
 
 <title>Comparison to other R packages</title>
 
@@ -122,13 +122,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -356,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Comparison to other R packages</h1>
 <h4 class="author">František Bartoš</h4>
-<h4 class="date">2022-07-09</h4>
+<h4 class="date">2022-09-14</h4>
 
 
 
@@ -638,8 +645,8 @@ Topolinski, S., &amp; Sparenberg, P. (2012). Turning the hands of time:
 </div>
 <div id="ref-wagenmakers2015turning" class="csl-entry">
 Wagenmakers, E.-J., Beek, T. F., Rotteveel, M., Gierholz, A., Matzke,
-D., Steingroever, H., Ly, A., Verhagen, J., Selker, R., Sasiadek,
-A.others. (2015). Turning the hands of time again: A purely confirmatory
+D., Steingroever, H., Ly, A., Verhagen, J., Selker, R., Sasiadek, A., et
+al. (2015). Turning the hands of time again: A purely confirmatory
 replication study and a <span>B</span>ayesian analysis. <em>Frontiers in
 Psychology</em>, <em>6</em>, 494. <a href="https://doi.org/10.3389/fpsyg.2015.00494">https://doi.org/10.3389/fpsyg.2015.00494</a>
 </div>
