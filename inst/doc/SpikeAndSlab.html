@@ -12,7 +12,7 @@
 
 <meta name="author" content="František Bartoš" />
 
-<meta name="date" content="2023-05-30" />
+<meta name="date" content="2023-06-23" />
 
 <title>Bayes factors via spike and slab prior vs. bridge sampling</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Bayes factors via spike and slab prior
 vs. bridge sampling</h1>
 <h4 class="author">František Bartoš</h4>
-<h4 class="date">2023-05-30</h4>
+<h4 class="date">2023-06-23</h4>
 
 
 
@@ -394,7 +394,7 @@ package to specify spike and slab priors that aim to explore most of the
 model space and obtain posterior inclusion probabilities for each
 predictor within a single MCMC run <span class="citation">(Kuo &amp;
 Mallick, 1998; O’Hara &amp; Sillanpää, 2009)</span>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BayesTools)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(BayesTools)</span></code></pre></div>
 <div id="simulated-data" class="section level2">
 <h2>Simulated Data</h2>
 <p>To keep it simple, let’s consider a linear regression with one
@@ -403,39 +403,39 @@ continuous predictor <span class="math inline">\(x\)</span>. We simulate
 variable <span class="math inline">\(y\)</span> under the presence of a
 small effect <span class="math inline">\(\beta\)</span> of a continuous
 predictor <span class="math inline">\(x\)</span>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="sc">-</span><span class="dv">68</span>) <span class="co"># set seed for reproducibility</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>N     <span class="ot">&lt;-</span> <span class="dv">100</span>      <span class="co"># number of observations</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>x     <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N) <span class="co"># continuous predictor</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.5</span>     <span class="co"># intercept</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>beta  <span class="ot">&lt;-</span> <span class="fl">0.15</span>     <span class="co"># small effect</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># compute the mean parameter for each predictor value</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta <span class="sc">*</span> x</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># generate the response for each observation </span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N, <span class="at">mean =</span> mu, <span class="at">sd =</span> <span class="dv">1</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="sc">-</span><span class="dv">68</span>) <span class="co"># set seed for reproducibility</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>N     <span class="ot">&lt;-</span> <span class="dv">100</span>      <span class="co"># number of observations</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>x     <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N) <span class="co"># continuous predictor</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.5</span>     <span class="co"># intercept</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>beta  <span class="ot">&lt;-</span> <span class="fl">0.15</span>     <span class="co"># small effect</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># compute the mean parameter for each predictor value</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta <span class="sc">*</span> x</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># generate the response for each observation </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N, <span class="at">mean =</span> mu, <span class="at">sd =</span> <span class="dv">1</span>) </span></code></pre></div>
 <p>We quickly verify that our simulated data correspond to the desired
 settings (up to a random error) with the <code>lm</code> function.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; lm(formula = y ~ x)</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.2960 -0.6832  0.0683  0.7448  2.3815 </span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Intercept)  -0.5487     0.1032  -5.315  6.7e-07 ***</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; x             0.1962     0.1010   1.943   0.0549 .  </span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 1.03 on 98 degrees of freedom</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.03708,    Adjusted R-squared:  0.02725 </span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; F-statistic: 3.774 on 1 and 98 DF,  p-value: 0.05494</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x))</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; lm(formula = y ~ x)</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; -2.2960 -0.6832  0.0683  0.7448  2.3815 </span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; (Intercept)  -0.5487     0.1032  -5.315  6.7e-07 ***</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; x             0.1962     0.1010   1.943   0.0549 .  </span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 1.03 on 98 degrees of freedom</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.03708,    Adjusted R-squared:  0.02725 </span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; F-statistic: 3.774 on 1 and 98 DF,  p-value: 0.05494</span></span></code></pre></div>
 </div>
 <div id="model-specification" class="section level2">
 <h2>Model Specification</h2>
@@ -454,21 +454,21 @@ mean 0 and standard deviation 0.5, e.g., <span class="math inline">\(\beta \sim 
 <p>First, we compute the Bayes factor model comparison via marginal
 likelihoods. To do that, we need to specify the likelihood for the
 response variable <span class="math inline">\(y\)</span>,</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model_likelihood <span class="ot">&lt;-</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;model{</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">  for(i in 1:N){</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">    y[i] ~ dnorm(mu[i], pow(sigma, -2))</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>model_likelihood <span class="ot">&lt;-</span> </span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="st">&quot;model{</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="st">  for(i in 1:N){</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="st">    y[i] ~ dnorm(mu[i], pow(sigma, -2))</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="st">&quot;</span></span></code></pre></div>
 <p>where <code>mu</code> corresponds to the mean parameter (that we
 specify via a formula in the next step) and <code>sigma</code> to a
 standard deviation of the response variable (that we treat as a nuisance
 parameter here).</p>
 <p>We specify formulas for the <code>mu</code> parameter of each of the
 considered models,</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>formula_M0 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="er">~</span> <span class="dv">1</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>formula_M1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="er">~</span> <span class="dv">1</span> <span class="sc">+</span> x)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>formula_M0 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="er">~</span> <span class="dv">1</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>formula_M1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="er">~</span> <span class="dv">1</span> <span class="sc">+</span> x)</span></code></pre></div>
 <p>where <code>1</code> corresponds to the intercept (it is not
 necessary for the second model as it is included by default).</p>
 <p>To finish the model specification, we set the prior distribution
@@ -479,61 +479,61 @@ create a list containing data for the model specified within
 the data contained within the formula for mu within
 <code>formula_M0</code> and <code>formula_M1</code> (specified in the
 second step).</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prior on the test parameter</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>prior_beta  <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>))</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># priors on the nuisance parameters</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>prior_int   <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">5</span>))</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>prior_sigma <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">5</span>), <span class="at">truncation =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="cn">Inf</span>))</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># the data list</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>data_list <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> y,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> N</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>data_formula <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># prior on the test parameter</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>prior_beta  <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># priors on the nuisance parameters</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>prior_int   <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">5</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>prior_sigma <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">5</span>), <span class="at">truncation =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="cn">Inf</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co"># the data list</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>data_list <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="at">y =</span> y,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="at">N =</span> N</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>data_formula <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="at">x =</span> x</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>)</span></code></pre></div>
 <p>We estimate the models with the <code>JAGS_fit</code> function. Since
 we are using the formula interface (which allows us to specify multiple
 formulas for different parameters), we need to pass the arguments as
 named lists,</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>M0 <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the `model_likelihood` part</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the `formula_M0` part </span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M0,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int)),</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># seed for reproducibility</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">0</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>M1 <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta)),</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">1</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>M0 <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="co"># specification for the `model_likelihood` part</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="co"># specification for the `formula_M0` part </span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M0,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int)),</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  <span class="co"># seed for reproducibility</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">0</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>)</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>M1 <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta)),</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">1</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>)</span></code></pre></div>
 <p>We quickly verify that our parameter estimates (from the full model)
 are similar to the frequentist results obtained via <code>lm</code>
 function earlier.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(M1)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept -0.547 0.104 -0.753 -0.548 -0.341     0.00081          0.008</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x          0.188 0.101 -0.012  0.189  0.385     0.00080          0.008</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma           1.042 0.076  0.905  1.037  1.205     0.00078          0.010</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  ESS R-hat</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept 16408 1.000</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x         15964 1.000</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma           9502 1.000</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(M1)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;                  Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept -0.547 0.104 -0.753 -0.548 -0.341     0.00081          0.008</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; (mu) x          0.188 0.101 -0.012  0.189  0.385     0.00080          0.008</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; sigma           1.042 0.076  0.905  1.037  1.205     0.00078          0.010</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;                  ESS R-hat</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; (mu) intercept 16408 1.000</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; (mu) x         15964 1.000</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; sigma           9502 1.000</span></span></code></pre></div>
 <p>To obtain the marginal likelihoods and compute Bayes factors, we only
 need to write the likelihood function corresponding to the JAGS model.
 Importantly, BayesTools handles all priors and formula related
@@ -541,54 +541,54 @@ computation automatically, in other words, we do not need to worry about
 computing the mean parameter based on the intercept and predictors since
 we already obtain the computed mu in the <code>parameters[[&quot;mu&quot;]]</code>
 object (a vector with a value for each y),</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(parameters, data){</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">dnorm</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x    =</span> data[[<span class="st">&quot;y&quot;</span>]],</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> parameters[[<span class="st">&quot;mu&quot;</span>]],</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd   =</span> parameters[[<span class="st">&quot;sigma&quot;</span>]],</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">log  =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(parameters, data){</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">dnorm</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>    <span class="at">x    =</span> data[[<span class="st">&quot;y&quot;</span>]],</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>    <span class="at">mean =</span> parameters[[<span class="st">&quot;mu&quot;</span>]],</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>    <span class="at">sd   =</span> parameters[[<span class="st">&quot;sigma&quot;</span>]],</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>    <span class="at">log  =</span> <span class="cn">TRUE</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  ))</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>}</span></code></pre></div>
 <p>where the <code>parameters</code> arguments is a list containing the
 parameters and <code>data</code> argument is a list containing data. We
 use <code>sum(dnorm(..., log = TRUE))</code> to sum the logarithmic
 likelihood of all observations.</p>
 <p>Finally, we pass our objects to the <code>JAGS_bridgesampling</code>
 function to compute the marginal likelihoods.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>marglik_model_H0 <span class="ot">&lt;-</span> <span class="fu">JAGS_bridgesampling</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the model part</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit           =</span> M0,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">log_posterior =</span> log_posterior,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list    =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># specification for the formula` part </span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M0,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int)),</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>marglik_model_H1 <span class="ot">&lt;-</span> <span class="fu">JAGS_bridgesampling</span>(</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit           =</span> M1,</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">log_posterior =</span> log_posterior,</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list    =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta)),</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>marglik_model_H0 <span class="ot">&lt;-</span> <span class="fu">JAGS_bridgesampling</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="co"># specification for the model part</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">fit           =</span> M0,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">log_posterior =</span> log_posterior,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">data          =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">prior_list    =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="co"># specification for the formula` part </span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M0,</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int)),</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula)</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>)</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>marglik_model_H1 <span class="ot">&lt;-</span> <span class="fu">JAGS_bridgesampling</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>  <span class="at">fit           =</span> M1,</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="at">log_posterior =</span> log_posterior,</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>  <span class="at">data          =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>  <span class="at">prior_list    =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta)),</span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>)</span></code></pre></div>
 <p>We specify a BayesTools model ensemble object that we interrogate
 with the <code>ensemble_inference_table</code> function for information
 about the test for the beta parameter.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>models_list <span class="ot">&lt;-</span> <span class="fu">models_inference</span>(<span class="fu">list</span>(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">model =</span> M0, <span class="at">marglik =</span> marglik_model_H0, <span class="at">prior_weights =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">model =</span> M1, <span class="at">marglik =</span> marglik_model_H1, <span class="at">prior_weights =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ensemble_info <span class="ot">&lt;-</span> <span class="fu">ensemble_inference</span>(models_list, <span class="at">parameters =</span> <span class="st">&quot;x&quot;</span>, <span class="at">is_null_list =</span> <span class="fu">list</span>(<span class="st">&quot;x&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)))</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ensemble_inference_table</span>(ensemble_info, <span class="at">parameters =</span> <span class="st">&quot;x&quot;</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Models Prior prob. Post. prob. Inclusion BF</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; x    1/2       0.500       0.541        1.181</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>models_list <span class="ot">&lt;-</span> <span class="fu">models_inference</span>(<span class="fu">list</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">model =</span> M0, <span class="at">marglik =</span> marglik_model_H0, <span class="at">prior_weights =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">model =</span> M1, <span class="at">marglik =</span> marglik_model_H1, <span class="at">prior_weights =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>))</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>ensemble_info <span class="ot">&lt;-</span> <span class="fu">ensemble_inference</span>(models_list, <span class="at">parameters =</span> <span class="st">&quot;x&quot;</span>, <span class="at">is_null_list =</span> <span class="fu">list</span>(<span class="st">&quot;x&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)))</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="fu">ensemble_inference_table</span>(ensemble_info, <span class="at">parameters =</span> <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt;   Models Prior prob. Post. prob. Inclusion BF</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; x    1/2       0.500       0.541        1.181</span></span></code></pre></div>
 <p>We find absence of evidence for either of the hypotheses, <span class="math inline">\(\text{BF}_{10} = 1.181\)</span>, with posterior
 probability of <span class="math inline">\(P(\mathcal{M}_{1} \mid
 \text{data}) = 0.542\)</span> (asuming equal prior probability specified
@@ -630,24 +630,24 @@ truncation if needed) corresponding to the alternative hypothesis.
 Furthermore, we need to specify the prior distribution for the inclusion
 via the <code>prior_inclusion</code> argument. Here, we use a <span class="math inline">\(\text{Spike}(0.5)\)</span> prior which sets the
 prior inclusion probability to 1/2.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>prior_beta_spike_and_slab <span class="ot">&lt;-</span> <span class="fu">prior_spike_and_slab</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_parameter =</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>)),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_inclusion =</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;spike&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">location =</span> <span class="fl">0.5</span>)) </span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>prior_beta_spike_and_slab <span class="ot">&lt;-</span> <span class="fu">prior_spike_and_slab</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="at">prior_parameter =</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>)),</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="at">prior_inclusion =</span> <span class="fu">prior</span>(<span class="at">distribution =</span> <span class="st">&quot;spike&quot;</span>, <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">location =</span> <span class="fl">0.5</span>)) </span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>)</span></code></pre></div>
 <p>Then we can directly proceed to calling the <code>JAGS_fit</code>
 function with the same specification as we used for the <code>M1</code>
 model, however, changing the prior distribution object for the predictor
 <code>x</code> to the newly created
 <code>prior_beta_spike_and_slab</code> prior distribution.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>MS <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta_spike_and_slab)),</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">1</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>MS <span class="ot">&lt;-</span> <span class="fu">JAGS_fit</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="at">model_syntax =</span> model_likelihood,</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="at">data         =</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> N),</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="at">prior_list   =</span> <span class="fu">list</span>(<span class="st">&quot;sigma&quot;</span> <span class="ot">=</span> prior_sigma),</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="at">formula_list       =</span> formula_M1,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="at">formula_prior_list =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;intercept&quot;</span> <span class="ot">=</span> prior_int, <span class="st">&quot;x&quot;</span> <span class="ot">=</span> prior_beta_spike_and_slab)),</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  <span class="at">formula_data_list  =</span> <span class="fu">list</span>(<span class="st">&quot;mu&quot;</span> <span class="ot">=</span> data_formula),</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>  <span class="at">seed         =</span> <span class="dv">1</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>)</span></code></pre></div>
 <p>We can again verify that our parameter estimates match the previous
 results. Now, we need to set the <code>conditional = TRUE</code>
 argument in the <code>JAGS_estimates_table</code> to obtain samples
@@ -655,23 +655,23 @@ assuming that the spike and slab parameter values are included. (The
 function summarized the complete posterior distribution by default,
 i.e., parameter estimates model-averaged across the spike and the
 slab.)</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(MS, <span class="at">conditional =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     -0.540 0.106 -0.749 -0.540 -0.333     0.00085          0.008</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x              0.189 0.100 -0.009  0.190  0.385     0.00145          0.012</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)  0.500 0.000  0.500  0.500  0.500          NA             NA</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma               1.050 0.076  0.912  1.047  1.211     0.00081          0.011</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      ESS R-hat</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     15590 1.000</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x              6830 1.000</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)    NA    NA</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma               8894 1.000</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(MS, <span class="at">conditional =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt;                      Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     -0.540 0.106 -0.749 -0.540 -0.333     0.00085          0.008</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; (mu) x              0.189 0.100 -0.009  0.190  0.385     0.00145          0.012</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)  0.500 0.000  0.500  0.500  0.500          NA             NA</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; sigma               1.050 0.076  0.912  1.047  1.211     0.00081          0.011</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt;                      ESS R-hat</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     15590 1.000</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; (mu) x              6830 1.000</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)    NA    NA</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; sigma               8894 1.000</span></span></code></pre></div>
 <p>The estimates are essentially identical to the estimates from the
 previous models. Finally, we can also obtain summary of the inclusion
 probabilities via the <code>JAGS_inference_table</code> function</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">JAGS_inference_table</span>(MS)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Parameter Prior prob. Post. prob. Inclusion BF</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     (mu) x       0.500       0.536        1.157</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">JAGS_inference_table</span>(MS)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt;  Parameter Prior prob. Post. prob. Inclusion BF</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt;     (mu) x       0.500       0.536        1.157</span></span></code></pre></div>
 <p>As before, we find absence of evidence for either of the hypotheses,
 <span class="math inline">\(\text{BF}_{10} = 1.157\)</span>, with
 posterior probability of <span class="math inline">\(P(\mathcal{M}_{1}
