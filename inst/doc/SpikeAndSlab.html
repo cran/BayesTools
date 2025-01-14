@@ -12,7 +12,7 @@
 
 <meta name="author" content="František Bartoš" />
 
-<meta name="date" content="2024-02-20" />
+<meta name="date" content="2025-01-14" />
 
 <title>Bayes factors via spike and slab prior vs. bridge sampling</title>
 
@@ -51,7 +51,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -150,6 +150,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
+margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -363,7 +364,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Bayes factors via spike and slab prior
 vs. bridge sampling</h1>
 <h4 class="author">František Bartoš</h4>
-<h4 class="date">2024-02-20</h4>
+<h4 class="date">2025-01-14</h4>
 
 
 
@@ -656,29 +657,24 @@ function summarized the complete posterior distribution by default,
 i.e., parameter estimates model-averaged across the spike and the
 slab.)</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(MS, <span class="at">conditional =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt;                      Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     -0.540 0.106 -0.749 -0.540 -0.333     0.00085          0.008</span></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; (mu) x              0.189 0.100 -0.009  0.190  0.385     0.00145          0.012</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)  0.500 0.000  0.500  0.500  0.500          NA             NA</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; sigma               1.050 0.076  0.912  1.047  1.211     0.00081          0.011</span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt;                      ESS R-hat</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     15590 1.000</span></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; (mu) x              6830 1.000</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)    NA    NA</span></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; sigma               8894 1.000</span></span></code></pre></div>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt;                      Mean    SD    lCI Median    uCI</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     -0.540 0.106 -0.749 -0.540 -0.333</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)  0.536    NA     NA     NA     NA</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; (mu) x              0.189 0.100 -0.009  0.190  0.385</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; sigma               1.050 0.076  0.912  1.047  1.211</span></span></code></pre></div>
 <p>The estimates are essentially identical to the estimates from the
 previous models. Finally, we can also obtain summary of the inclusion
 probabilities via the <code>JAGS_inference_table</code> function</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">JAGS_inference_table</span>(MS)</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt;  Parameter Prior prob. Post. prob. Inclusion BF</span></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt;     (mu) x       0.500       0.536        1.157</span></span></code></pre></div>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt;        Prior prob. Post. prob. Inclusion BF</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; (mu) x       0.500       0.536        1.157</span></span></code></pre></div>
 <p>As before, we find absence of evidence for either of the hypotheses,
 <span class="math inline">\(\text{BF}_{10} = 1.157\)</span>, with
 posterior probability of <span class="math inline">\(P(\mathcal{M}_{1}
 \mid \text{data}) = 0.536\)</span>.</p>
 <div id="references" class="section level3 unnumbered">
 <h3 class="unnumbered">References</h3>
-<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-RoBSA" class="csl-entry">
 Bartoš, F. (2022). <em><span>RoBSA</span>: <span>A</span>n
 <span>R</span> package for robust <span>B</span>ayesian
