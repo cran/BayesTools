@@ -1,6 +1,6 @@
 Package: BayesTools
 Title: Tools for Bayesian Analyses
-Version: 0.2.18
+Version: 0.2.19
 Description: Provides tools for conducting Bayesian analyses and Bayesian model averaging 
     (Kass and Raftery, 1995, <doi:10.1080/01621459.1995.10476572>, 
     Hoeting et al., 1999, <doi:10.1214/ss/1009212519>). The package contains 
@@ -24,11 +24,12 @@ Depends: stats
 Imports: graphics, extraDistr, mvtnorm, coda, bridgesampling, parallel,
         ggplot2, Rdpack, rlang
 Suggests: scales, testthat, vdiffr, covr, knitr, rstan, rjags, runjags,
-        BayesFactor, rmarkdown
+        BayesFactor, RoBMA, rmarkdown
 RdMacros: Rdpack
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2025-01-14 15:54:13 UTC; fbart
-Author: František Bartoš [aut, cre] (<https://orcid.org/0000-0002-0018-5573>)
+Packaged: 2025-06-08 15:35:08 UTC; fbart
+Author: František Bartoš [aut, cre] (ORCID:
+    <https://orcid.org/0000-0002-0018-5573>)
 Repository: CRAN
-Date/Publication: 2025-01-14 17:10:06 UTC
+Date/Publication: 2025-06-08 16:20:05 UTC
