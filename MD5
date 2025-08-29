@@ -1,10 +1,10 @@
-e4865cb561978bf5b7691a996b5a8864 *DESCRIPTION
+b80264e3559dd9b8bf3477411798cb7a *DESCRIPTION
 07fc696f1bb72138874379102f286245 *NAMESPACE
-da508ebe5bd839a44be0b2596abb0efa *NEWS.md
+43e12336a49326a96fd4a11de741d30e *NEWS.md
 03cbc47bb59af1acad7c968f474ccf0f *R/BayesTools-package.R
 1ebb80992da6ef39df5f23f7193d38f8 *R/JAGS-diagnostics.R
-142c0463341d45b7975f424d0d68ac94 *R/JAGS-fit.R
-a4985b738627e7086afa116c0590e424 *R/JAGS-formula.R
+f6d4acc0db63f787aacd238200f2d31a *R/JAGS-fit.R
+840624ddc63657be846a048c34ff7705 *R/JAGS-formula.R
 6cd0b678aa0b3037394429d8839b65ae *R/JAGS-marglik.R
 0e385377d9b339928efab7141a0487b4 *R/data.R
 1c1b4af74d9bed5435bd97f763baf312 *R/distributions-mpoint.R
@@ -25,7 +25,7 @@ a99d98f564c152fbe69599d4deb466ad *R/summary-tables.R
 9fb1abaa0db81e9836b86540c249882a *R/tools.R
 db65a0279f7fba81502947c46c338e23 *R/zzz.R
 610ac818d57779d24bc172c416a92a6a *README.md
-1e627f3ab8549fefb5c8b8e6682ee479 *build/partial.rdb
+90c8a9d440a563eb4b7c5cbf193551cc *build/partial.rdb
 ae154f345ebe45f678969369f48cd142 *build/vignette.rds
 4cb00f6da3f9e792ca5ce3fdf44adb28 *data/kitchen_rolls.RData
 a680e518cdcbad8ce3f0bec8236b836a *inst/CITATION
@@ -33,10 +33,10 @@ fb30d22c921518ff1b65cc3b7e2a8a42 *inst/REFERENCES.bib
 bb4253fc50b5772dcbafae0756498e0b *inst/apa.csl
 7cb75e7f2cacc4610206b773bc57abfc *inst/doc/ComparisonR.R
 ef019b41ba308ec35953645bee12317e *inst/doc/ComparisonR.Rmd
-282597498cc4453529d903161f57f9f6 *inst/doc/ComparisonR.html
+74d9f2df1d44ea5e24fdea4d6734d8cc *inst/doc/ComparisonR.html
 399074424f60f02ae8bc85df2d494fe7 *inst/doc/SpikeAndSlab.R
 6b01d666c1af9968c9fc42745396ecdb *inst/doc/SpikeAndSlab.Rmd
-f4a8fe150d2f504954d7122f3a732241 *inst/doc/SpikeAndSlab.html
+890cae8713b3280249c7e91a4d7e7a55 *inst/doc/SpikeAndSlab.html
 9bf44d7b67f49d28a078bb604ebc7385 *man/BayesTools.Rd
 88649fc27ce4a7ee91e23da17acf9b9c *man/BayesTools_ensemble_tables.Rd
 3fc3ec016718e9f09011c333c7a15b46 *man/BayesTools_model_tables.Rd
@@ -48,7 +48,7 @@ a76490940d03a03e62dcf62c57484fed *man/JAGS_check_and_list.Rd
 088bf3df3c6a01e8416b81610a7f529b *man/JAGS_diagnostics.Rd
 323ac9c0ea0d723baabefd9de7f1e450 *man/JAGS_evaluate_formula.Rd
 76e1a73891c7366e10c152d06cd440bf *man/JAGS_fit.Rd
-0816355f4541e3b8f09f6c79ea707710 *man/JAGS_formula.Rd
+aa18cff78f0f8daa005766d1d8dc9601 *man/JAGS_formula.Rd
 9cfbc763335a018387b97c8a2a4fd305 *man/JAGS_get_inits.Rd
 9eae8a41af02f1408518e46c94bb53cf *man/JAGS_marglik_parameters.Rd
 37cfee795d0c21ece107843c3e42b2c3 *man/JAGS_marglik_priors.Rd
@@ -59,9 +59,7 @@ b9ac772c07997ff6bd3cde7082124f76 *man/Savage_Dickey_BF.Rd
 373513dee4e808bcb40351405fa6df22 *man/as_mixed_posteriors.Rd
 541d631ee94b420a891e946330ddc623 *man/bridgesampling_object.Rd
 3e5227a35b7d6e05f2ce6ad9d162d024 *man/check_input.Rd
-b1f9ff18c6016ec2b9ba35ca1dcab349 *man/contr.independent.Rd
-cd9d6c9fa8407f422e82ac2c5978fc26 *man/contr.meandif.Rd
-39aeb806b5a986db419aa0e869831a33 *man/contr.orthonormal.Rd
+256300795cfa7249f62f4e8c7d03a2b7 *man/contr.BayesTools.Rd
 0d019f66b181c21c452cad5f128fa0b3 *man/density.prior.Rd
 465b2b9c57c2e9f424a61630311824d0 *man/ensemble_inference.Rd
 0aeddf3f811b3101f4cefc47a83f0a22 *man/figures/README-unnamed-chunk-11-1.png
