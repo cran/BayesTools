@@ -1,8 +1,8 @@
-97b4f04d464c9583931082b6517b7a23 *DESCRIPTION
+b9e2b65bfd87d13f033d743e94b1c02a *DESCRIPTION
 07fc696f1bb72138874379102f286245 *NAMESPACE
-f037ff86c2f18fa545f84cdadf03fa32 *NEWS.md
+17d9118a18ca8f493e02c9ba0a662b72 *NEWS.md
 03cbc47bb59af1acad7c968f474ccf0f *R/BayesTools-package.R
-d4ac914eb7c6a13b81ed3e50566ee3e5 *R/JAGS-diagnostics.R
+93fc77cfe08b7bc59b8685038942a46e *R/JAGS-diagnostics.R
 8782f3cceb64e2fad8ba31a7cfea8abd *R/JAGS-fit.R
 709dd4de7c316433e027228429bcdee7 *R/JAGS-formula.R
 6cd0b678aa0b3037394429d8839b65ae *R/JAGS-marglik.R
@@ -13,7 +13,7 @@ d80688921869336a8129de7ca32d5497 *R/distributions-tools.R
 ca8e19fd504bfe0ade79495de102245b *R/distributions-weightfunctions.R
 334dadd7ed27777c1a8439b8357cd655 *R/interpret.R
 f0b6eec6bfa4eee57f6dde68c838d6f8 *R/marginal-distributions.R
-1a58e251af212aaa2eefb3a65168e601 *R/model-averaging-plots.R
+eb431d73fcd22510ef6d19b5f07010c5 *R/model-averaging-plots.R
 29b1611a074a79b930519fd32b4f3085 *R/model-averaging.R
 c3ed385f23d02c6231afcf0d2f239cbf *R/priors-density.R
 66f0f97cec8b42bfe921babd819da0ff *R/priors-informed.R
@@ -25,7 +25,7 @@ d0ec58dd9998060c84f4b3dee98aa5fc *R/priors.R
 9fb1abaa0db81e9836b86540c249882a *R/tools.R
 db65a0279f7fba81502947c46c338e23 *R/zzz.R
 610ac818d57779d24bc172c416a92a6a *README.md
-3bce4f02b69b6d905ba96582f83e7ed8 *build/partial.rdb
+135dd9cf039bee22cd8bb46d00525f55 *build/partial.rdb
 ae154f345ebe45f678969369f48cd142 *build/vignette.rds
 4cb00f6da3f9e792ca5ce3fdf44adb28 *data/kitchen_rolls.RData
 a680e518cdcbad8ce3f0bec8236b836a *inst/CITATION
@@ -33,10 +33,10 @@ fb30d22c921518ff1b65cc3b7e2a8a42 *inst/REFERENCES.bib
 bb4253fc50b5772dcbafae0756498e0b *inst/apa.csl
 7cb75e7f2cacc4610206b773bc57abfc *inst/doc/ComparisonR.R
 ef019b41ba308ec35953645bee12317e *inst/doc/ComparisonR.Rmd
-6318f5fe0c133b40ca702c570754747a *inst/doc/ComparisonR.html
+551c88309260e4660df173d12d7003f7 *inst/doc/ComparisonR.html
 399074424f60f02ae8bc85df2d494fe7 *inst/doc/SpikeAndSlab.R
 6b01d666c1af9968c9fc42745396ecdb *inst/doc/SpikeAndSlab.Rmd
-cf7e3b326310f8bccf7c01d6a96f86ca *inst/doc/SpikeAndSlab.html
+d04b3f8bd8a04005e918325a10261365 *inst/doc/SpikeAndSlab.html
 9bf44d7b67f49d28a078bb604ebc7385 *man/BayesTools.Rd
 88649fc27ce4a7ee91e23da17acf9b9c *man/BayesTools_ensemble_tables.Rd
 3fc3ec016718e9f09011c333c7a15b46 *man/BayesTools_model_tables.Rd
