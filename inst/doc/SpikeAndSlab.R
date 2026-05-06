@@ -1,7 +1,6 @@
 ## ----setup, include = FALSE---------------------------------------------------
-# is_check <- ("CheckExEnv" %in% search()) ||
-#              any(c("_R_CHECK_TIMINGS_", "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
-is_check <- F
+is_check <- ("CheckExEnv" %in% search()) ||
+             any(c("_R_CHECK_TIMINGS_", "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment  = "#>",
@@ -156,5 +155,5 @@ MS <- JAGS_fit(
 JAGS_estimates_table(MS, conditional = TRUE)
 
 ## -----------------------------------------------------------------------------
-JAGS_inference_table(MS)
+JAGS_inference_table(MS, BF_diagnostics = TRUE)
 

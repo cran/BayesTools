@@ -12,7 +12,7 @@
 
 <meta name="author" content="František Bartoš" />
 
-<meta name="date" content="2025-12-08" />
+<meta name="date" content="2026-05-05" />
 
 <title>Bayes factors via spike and slab prior vs. bridge sampling</title>
 
@@ -365,7 +365,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Bayes factors via spike and slab prior
 vs. bridge sampling</h1>
 <h4 class="author">František Bartoš</h4>
-<h4 class="date">2025-12-08</h4>
+<h4 class="date">2026-05-05</h4>
 
 
 
@@ -528,14 +528,14 @@ named lists,</p>
 are similar to the frequentist results obtained via <code>lm</code>
 function earlier.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(M1)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;                  Mean    SD    lCI Median    uCI error(MCMC) error(MCMC)/SD</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept -0.547 0.104 -0.753 -0.548 -0.341     0.00081          0.008</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; (mu) x          0.188 0.101 -0.012  0.189  0.385     0.00080          0.008</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; sigma           1.042 0.076  0.905  1.037  1.205     0.00078          0.010</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;                  Mean    SD  0.025    0.5  0.975 error(MCMC) error(MCMC)/SD</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept -0.546 0.104 -0.753 -0.546 -0.338     0.00084          0.008</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; (mu) x          0.188 0.101 -0.012  0.188  0.386     0.00080          0.008</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; sigma           1.042 0.076  0.907  1.037  1.205     0.00081          0.011</span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;                  ESS R-hat</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; (mu) intercept 16408 1.000</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; (mu) x         15964 1.000</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; sigma           9502 1.000</span></span></code></pre></div>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; (mu) intercept 15488 1.000</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; (mu) x         15708 1.000</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; sigma           9004 1.000</span></span></code></pre></div>
 <p>To obtain the marginal likelihoods and compute Bayes factors, we only
 need to write the likelihood function corresponding to the JAGS model.
 Importantly, BayesTools handles all priors and formula related
@@ -658,17 +658,19 @@ function summarized the complete posterior distribution by default,
 i.e., parameter estimates model-averaged across the spike and the
 slab.)</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">JAGS_estimates_table</span>(MS, <span class="at">conditional =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt;                      Mean    SD    lCI Median    uCI</span></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     -0.540 0.106 -0.749 -0.540 -0.333</span></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)  0.536    NA     NA     NA     NA</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; (mu) x              0.189 0.100 -0.009  0.190  0.385</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; sigma               1.050 0.076  0.912  1.047  1.211</span></span></code></pre></div>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt;                      Mean    SD  0.025    0.5  0.975</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; (mu) intercept     -0.542 0.105 -0.750 -0.543 -0.337</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; (mu) x (inclusion)  0.553    NA     NA     NA     NA</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; (mu) x              0.189 0.100 -0.005  0.190  0.384</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; sigma               1.049 0.077  0.911  1.045  1.212</span></span></code></pre></div>
 <p>The estimates are essentially identical to the estimates from the
 previous models. Finally, we can also obtain summary of the inclusion
 probabilities via the <code>JAGS_inference_table</code> function</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">JAGS_inference_table</span>(MS)</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt;        Prior prob. Post. prob. Inclusion BF</span></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; (mu) x       0.500       0.536        1.157</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">JAGS_inference_table</span>(MS, <span class="at">BF_diagnostics =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt;        Prior prob. Post. prob. Inclusion BF  ESS error(Post. prob.)</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; (mu) x       0.500       0.553        1.235 4886            0.00711</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt;        error%(Inclusion BF)</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt; (mu) x                2.877</span></span></code></pre></div>
 <p>As before, we find absence of evidence for either of the hypotheses,
 <span class="math inline">\(\text{BF}_{10} = 1.157\)</span>, with
 posterior probability of <span class="math inline">\(P(\mathcal{M}_{1}
